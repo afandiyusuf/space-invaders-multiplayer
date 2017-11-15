@@ -2,436 +2,69 @@
 <!doctype html>
 <html>
     <head>
-        <meta charset="UTF-8" />
-        <title>Phaser Example Runner</title>
-        <meta name="viewport" content="initial-scale=1 maximum-scale=1 user-scalable=0 minimal-ui" />
-        <script src="js/jquery-2.0.3.min.js" type="text/javascript"></script>
-        <script src="js/phaser.2.6.2.min.js" type="text/javascript"></script>
-        <script src="js/blob.js" type="text/javascript"></script>
-        <script src="js/canvas-to-blob.js" type="text/javascript"></script>
-        <script src="js/filesaver.js" type="text/javascript"></script>
-        <script src="js/embed.js" type="text/javascript"></script>
-        <script src="/socket.io/socket.io.js"></script>
-        <style>
-            body {
-                margin: 0px;
-                padding: 0px;
-                font-family: Arial;
-                font-size: 14px;
-                background-color: #000000;
-                color: #fff;    
-            }
-        </style>
-    </head>
+    <title>Phaser Full Screen Mobile Example</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1, IE=9">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="HandheldFriendly" content="true" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Phaser App">
+    <meta name="viewport" content="initial-scale=1 maximum-scale=1 user-scalable=0 minimal-ui shrink-to-fit=no" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <!-- non-retina iPhone pre iOS 7 -->
+    <link rel="apple-touch-icon" sizes="57x57" href="icons/app_icon_57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="icons/app_icon_60x60.png">
+    <!-- non-retina iPad pre iOS 7 -->
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/app_icon_72x72.png">
+    <!-- non-retina iPad iOS 7 -->
+    <link rel="apple-touch-icon" sizes="76x76" href="icons/app_icon_76x76.png">
+    <!-- retina iPhone pre iOS 7 -->
+    <link rel="apple-touch-icon" sizes="114x114" href="icons/app_icon_114x114.png">
+    <!-- retina iPhone iOS 7 -->
+    <link rel="apple-touch-icon" sizes="120x120" href="icons/app_icon_120x120.png">
+    <!-- retina iPad pre iOS 7 -->
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/app_icon_144x144.png">
+    <!-- retina iPad iOS 7 -->
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/app_icon_152x152.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/app_icon_256x256.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/app_icon_512x512.png">
+    <link rel="apple-touch-icon" sizes="1024x1024" href="icons/app_icon_1024x1024.png">
+    <link rel="stylesheet" href="css/stylesheet.css" type="text/css" charset="utf-8" />
+    <script src="js/phaser.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="js/phaser-virtual-joystick.min.js"></script>
+    <script src="src_game/object/Player.js"></script>
+    <script src="src_game/Boot.js"></script>
+    <script src="src_game/Preloader.js"></script>
+    <script src="src_game/MainMenu.js"></script>
+    <script src="src_game/Game.js"></script>
+</head>
     <body>
-        <div id="phaser-example"></div>
+        <div id="game"></div>
+        <div id="orientation"></div>
 
         <script type="text/javascript">
-
         var IDE_HOOK = false;
         var VERSION = '2.6.2';
-
-var Client = {};
-Client.socket = io();
-var isPlay = false;
-var buttonRight = false;
-var buttonLeft = false;
-var buttonFire = false;
-
-Client.askNewPlayer = function(){
-    var session_game = "Game"+Math.random()*10000;
-    Client.socket.emit("createGame",session_game);
-}
-Client.socket.on('newplayer',function(data){
-    console.log(data.id,data.x,data.y);
-});
-
-Client.socket.on('player_request_join',function(data){
-    console.log("player with session "+data+" connected");
-    isPlay = true;
-    stateText.visible = false;
-});
-
-Client.socket.on('create_game_fail',function(){
-    stateText.visible = true;
-    stateText.text = "game already hosted";
-});
-
-Client.socket.on('action',function(data){
-    console.log(data);
-    if(data.act_name == "left")
-    {
-        if(data.act_behaviour == "down")
-        {
-            buttonLeft = true;
-        }
-        else if(data.act_behaviour == "up")
-        {
-            console.log("left up");
-            buttonLeft = false;
-        }
-    }
-    else if(data.act_name == "right")
-    {
-        if(data.act_behaviour == "down")
-        {
-            console.log("go to right");
-            buttonRight = true;
-        }
-        else if(data.act_behaviour == "up")
-        {
-            buttonRight = false;
-        }
-    }else if(data.act_name == "fire")
-    {
-        if(data.act_behaviour == "down")
-        {
-            buttonFire = true;
-        }else if(data.act_behaviour == "up")
-        {
-            buttonFire = false;
-        }
-    }
-});
-
-
-
-      
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {init:init, preload: preload, create: create, update: update, render: render });
-
-function init(){
-    game.stage.disableVisibilityChange = true;
-}
-function preload() {
-
-    game.load.image('bullet', 'assets/games/invaders/bullet.png');
-    game.load.image('enemyBullet', 'assets/games/invaders/enemy-bullet.png');
-    game.load.spritesheet('invader', 'assets/games/invaders/invader32x32x4.png', 32, 32);
-    game.load.image('ship', 'assets/games/invaders/player.png');
-    game.load.spritesheet('kaboom', 'assets/games/invaders/explode.png', 128, 128);
-    game.load.image('starfield', 'assets/games/invaders/starfield.png');
-    game.load.image('background', 'assets/games/starstruck/background2.png');
-
-}
-
-var player;
-var aliens;
-var bullets;
-var bulletTime = 0;
-var cursors;
-var fireButton;
-var explosions;
-var starfield;
-var score = 0;
-var scoreString = '';
-var scoreText;
-var lives;
-var enemyBullet;
-var firingTimer = 0;
-var stateText;
-var livingEnemies = [];
-
-function create() {
-
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-
-    //  The scrolling starfield background
-    starfield = game.add.tileSprite(0, 0, 800, 600, 'starfield');
-
-    //  Our bullet group
-    bullets = game.add.group();
-    bullets.enableBody = true;
-    bullets.physicsBodyType = Phaser.Physics.ARCADE;
-    bullets.createMultiple(30, 'bullet');
-    bullets.setAll('anchor.x', 0.5);
-    bullets.setAll('anchor.y', 1);
-    bullets.setAll('outOfBoundsKill', true);
-    bullets.setAll('checkWorldBounds', true);
-
-    // The enemy's bullets
-    enemyBullets = game.add.group();
-    enemyBullets.enableBody = true;
-    enemyBullets.physicsBodyType = Phaser.Physics.ARCADE;
-    enemyBullets.createMultiple(30, 'enemyBullet');
-    enemyBullets.setAll('anchor.x', 0.5);
-    enemyBullets.setAll('anchor.y', 1);
-    enemyBullets.setAll('outOfBoundsKill', true);
-    enemyBullets.setAll('checkWorldBounds', true);
-
-    //  The baddies!
-    aliens = game.add.group();
-    aliens.enableBody = true;
-    aliens.physicsBodyType = Phaser.Physics.ARCADE;
-
-    createAliens();
-
-    //  The score
-    scoreString = 'Score : ';
-    scoreText = game.add.text(10, 10, scoreString + score, { font: '34px Arial', fill: '#fff' });
-
-    //  Lives
-    lives = game.add.group();
-    game.add.text(game.world.width - 100, 10, 'Lives : ', { font: '34px Arial', fill: '#fff' });
-
-    //  Text
-    stateText = game.add.text(game.world.centerX,game.world.centerY,' ', { font: '84px Arial', fill: '#fff' });
-    stateText.anchor.setTo(0.5, 0.5);
-    stateText.visible = false;
-
-    for (var i = 0; i < 3; i++) 
-    {
-        var ship = lives.create(game.world.width - 100 + (30 * i), 60, 'ship');
-        ship.anchor.setTo(0.5, 0.5);
-        ship.angle = 90;
-        ship.alpha = 0.4;
-    }
-
-    //  An explosion pool
-    explosions = game.add.group();
-    explosions.createMultiple(30, 'kaboom');
-    explosions.forEach(setupInvader, this);
-
-    //  And some controls to play the game with
-    cursors = game.input.keyboard.createCursorKeys();
-    fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-
-
-    //  The hero!
-    player = game.add.sprite(400, 500, 'ship');
-    player.anchor.setTo(0.5, 0.5);
-    game.physics.enable(player, Phaser.Physics.ARCADE);
-
-    stateText.text = " Waiting player";
-    stateText.visible = true;
-
-    Client.askNewPlayer();
-}
-
-
-function createAliens () {
-
-    for (var y = 0; y < 4; y++)
-    {
-        for (var x = 0; x < 10; x++)
-        {
-            var alien = aliens.create(x * 48, y * 50, 'invader');
-            alien.anchor.setTo(0.5, 0.5);
-            alien.animations.add('fly', [ 0, 1, 2, 3 ], 20, true);
-            alien.play('fly');
-            alien.body.moves = false;
-        }
-    }
-
-    aliens.x = 100;
-    aliens.y = 50;
-
-    //  All this does is basically start the invaders moving. Notice we're moving the Group they belong to, rather than the invaders directly.
-    var tween = game.add.tween(aliens).to( { x: 200 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
-
-    //  When the tween loops it calls descend
-    tween.onLoop.add(descend, this);
-}
-
-function setupInvader (invader) {
-
-    invader.anchor.x = 0.5;
-    invader.anchor.y = 0.5;
-    invader.animations.add('kaboom');
-
-}
-
-function descend() {
-
-    aliens.y += 10;
-
-}
-
-function update() {
-    if(!isPlay)
-        return;
-    //  Scroll the background
-    starfield.tilePosition.y += 2;
-
-    if (player.alive)
-    {
-        //  Reset the player, then check for movement keys
-        player.body.velocity.setTo(0, 0);
-
-        //if (cursors.left.isDown)
-        if(buttonLeft)
-        {
-            player.body.velocity.x = -200;
-        }
-        //else if (cursors.right.isDown)
-        else if(buttonRight)
-        {
-            player.body.velocity.x = 200;
-        }
-
-        //  Firing?
-        //if (fireButton.isDown)
-        if(buttonFire)
-        {
-            fireBullet();
-        }
-
-        if (game.time.now > firingTimer)
-        {
-            enemyFires();
-        }
-
-        //  Run collision
-        game.physics.arcade.overlap(bullets, aliens, collisionHandler, null, this);
-        game.physics.arcade.overlap(enemyBullets, player, enemyHitsPlayer, null, this);
-    }
-
-}
-
-function render() {
-
-    // for (var i = 0; i < aliens.length; i++)
-    // {
-    //     game.debug.body(aliens.children[i]);
-    // }
-
-}
-
-function collisionHandler (bullet, alien) {
-
-    //  When a bullet hits an alien we kill them both
-    bullet.kill();
-    alien.kill();
-
-    //  Increase the score
-    score += 20;
-    scoreText.text = scoreString + score;
-
-    //  And create an explosion :)
-    var explosion = explosions.getFirstExists(false);
-    explosion.reset(alien.body.x, alien.body.y);
-    explosion.play('kaboom', 30, false, true);
-
-    if (aliens.countLiving() == 0)
-    {
-        score += 1000;
-        scoreText.text = scoreString + score;
-
-        enemyBullets.callAll('kill',this);
-        stateText.text = " You Won, \n Click to restart";
-        stateText.visible = true;
-
-        //the "click to restart" handler
-        game.input.onTap.addOnce(restart,this);
-    }
-
-}
-
-
-
-function enemyHitsPlayer (player,bullet) {
-    
-    bullet.kill();
-
-    live = lives.getFirstAlive();
-
-    if (live)
-    {
-        live.kill();
-    }
-
-    //  And create an explosion :)
-    var explosion = explosions.getFirstExists(false);
-    explosion.reset(player.body.x, player.body.y);
-    explosion.play('kaboom', 30, false, true);
-
-    // When the player dies
-    if (lives.countLiving() < 1)
-    {
-        player.kill();
-        enemyBullets.callAll('kill');
-
-        stateText.text=" GAME OVER \n Click to restart";
-        stateText.visible = true;
-
-        //the "click to restart" handler
-        game.input.onTap.addOnce(restart,this);
-    }
-
-}
-
-function enemyFires () {
-
-    //  Grab the first bullet we can from the pool
-    enemyBullet = enemyBullets.getFirstExists(false);
-
-    livingEnemies.length=0;
-
-    aliens.forEachAlive(function(alien){
-
-        // put every living enemy in an array
-        livingEnemies.push(alien);
-    });
-
-
-    if (enemyBullet && livingEnemies.length > 0)
-    {
-        
-        var random=game.rnd.integerInRange(0,livingEnemies.length-1);
-
-        // randomly select one of them
-        var shooter=livingEnemies[random];
-        // And fire the bullet from this enemy
-        enemyBullet.reset(shooter.body.x, shooter.body.y);
-
-        game.physics.arcade.moveToObject(enemyBullet,player,120);
-        firingTimer = game.time.now + 2000;
-    }
-
-}
-
-function fireBullet () {
-
-    //  To avoid them being allowed to fire too fast we set a time limit
-    if (game.time.now > bulletTime)
-    {
-        //  Grab the first bullet we can from the pool
-        bullet = bullets.getFirstExists(false);
-
-        if (bullet)
-        {
-            //  And fire it
-            bullet.reset(player.x, player.y + 8);
-            bullet.body.velocity.y = -400;
-            bulletTime = game.time.now + 200;
-        }
-    }
-
-}
-
-function resetBullet (bullet) {
-
-    //  Called if the bullet goes out of the screen
-    bullet.kill();
-
-}
-
-function restart () {
-
-    //  A new level starts
-    
-    //resets the life count
-    lives.callAll('revive');
-    //  And brings the aliens back from the dead :)
-    aliens.removeAll();
-    createAliens();
-
-    //revives the player
-    player.revive();
-    //hides the text
-    stateText.visible = false;
-
-}
-        
+        var Client = {};
+        Client.socket = io();
+        (function () {
+            //  Create your Phaser game and inject it into the game div.
+            //  We did it in a window.onload event, but you can do it anywhere (requireJS load, anonymous function, jQuery dom ready, - whatever floats your boat)
+            //  We're using a game size of 1024 x 768 here, but you can use whatever you feel makes sense for your game of course.
+            var Client;
+            var session;
+
+            var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game');
+            //  Add the States your game has.
+            //  You don't have to do this in the html, it could be done in your Boot state too, but for simplicity I'll keep it here.
+            game.state.add('Boot', BasicGame.Boot);
+            game.state.add('Game', BasicGame.Game);
+            //  Now start the Boot state.
+            game.state.start('Boot');
+        })();        
         </script>
 
     </body>

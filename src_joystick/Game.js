@@ -157,9 +157,6 @@ BasicGame.Game.prototype = {
             data.act_name= "fire";
             Client.socket.emit("req_up_action",data);
         }
-        //console.log(this.stick.forceX);
-		//	Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
-
 	},
 
 	quitGame: function (pointer) {

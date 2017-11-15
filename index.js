@@ -8,6 +8,8 @@ app.use('/assets',express.static(__dirname+'/assets'));
 app.use('/js',express.static(__dirname+'/js'));
 app.use('/css',express.static(__dirname+'/css'));
 app.use('/src',express.static(__dirname+'/src'));
+app.use('/src_joystick',express.static(__dirname+'/src_joystick'));
+app.use('/src_game',express.static(__dirname+'/src_game'));
 app.use('/images',express.static(__dirname+'/images'));
 
 app.get('/', function(req,res){
