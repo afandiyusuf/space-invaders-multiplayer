@@ -1,14 +1,14 @@
-Player = function(game){
+Player = function(game,id){
 	this.game = game;
 	this.jumpTimer = 0;
     this.cursors;
     this.jumpButton;
     this.facing = 'left';
+    this.id = id;
 };
 Player.prototype = {
 	create:function(){
 		this.instance = this.game.add.sprite(32, 320, 'dude');
-
 	},
 	initPhysic:function(){
 		this.instance.body.collideWorldBounds = true;
@@ -20,8 +20,9 @@ Player.prototype = {
         this.instance.animations.add('turn', [4], 20, true);
         this.instance.animations.add('right', [5, 6, 7, 8], 10, true);
 	},
-	initControl:function(cursors,jumpButton)
+	registerControl:function(cursors,jumpButton)
 	{
+        console.log(this.cursors,cursors);
 		this.cursors = cursors;
 		this.jumpButton = jumpButton;
 	},
@@ -76,5 +77,8 @@ Player.prototype = {
 	},
 	getPlayer:function(){
 		return this.instance;
-	}
+	},
+    getId : function(){
+        return this.id;
+    }
 }

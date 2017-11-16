@@ -61,7 +61,7 @@ BasicGame.Game.prototype = {
     },
     joinClick:function(){
 
-        session = Math.random()*100;
+        session = Math.floor(Math.random()*1000)+"SESSIONGAME";
         Client.socket.emit('request_playing',session);
     },
     create_joystick:function(){
