@@ -37,10 +37,25 @@ Fungsi dari phaser, dipanggil setelah preload dijalankan, biasanya inisiasi worl
 
 Fungsi dari phaser, dipanggil setiap frame, digunakan utuk fungsi logic game, yang membutuhkan pengecekan secara berkala.
 
-#### initiateConnection
+#### emitAction
 
-Fungsi ini dipanggil saat create, menginisiasi semua fungsi websocekt.
-Socket tersebut dibuat class, dan berada pada object/Socket.js
+Fungsi  yang digunakan untuk mentrigger websocket jika kita ingin mentrigger fungsi.
+
+Data yang dikirimkan adalah sebagai berikut
+
+````
+	//session player, ini nanti sebagai identitas socket game dari socket lainnya
+	data.session = session; 
+	
+	/* act behaviour, sekarang ada ("down, up") state yang ingin dikirim, singkatnya, 
+	*/ jika user menekan tombol, kirim down, jika user melepas tombol kirim up
+	data.act_behaviour=act_behaviour; 
+	
+	/* act name, sekarang ada ("left, right, fire") nama tombol yang sedang dikirim,
+	*  singkatnya, ini adalah nama tombol yang nanti dikenali oleh game
+	*/
+	data.act_name= act_name;  
+````
 
 
 
