@@ -34,6 +34,9 @@ BasicGame.Game.prototype = {
         this.load.image('join_btn','assets/joinbutton.png');
         this.load.atlas('generic', 'images/generic-joystick.png', 'images/generic-joystick.json');
     },
+    /*
+        Inisiasi socket.
+     */
 	create: function () {
         Client = {};
         Client.socket = io();
@@ -45,12 +48,19 @@ BasicGame.Game.prototype = {
             _.server_full();
         });
 	},
+    /*
+        Trigger saat server full
+     */
     server_full:function(){
         
         _.stateText.text = "Server full please wait";
 
     },
+    /*
+        Waiting screen yang berisi tombol join
+     */
     create_waitingScreen:function(){
+
         this.stateText = this.game.add.text(this.game.world.centerX,10,'Click button to join', { font: '84px Arial', fill: '#fff' });
         this.stateText.anchor.setTo(0.5, 0.5);
         this.stateText.visible = true;
@@ -59,6 +69,7 @@ BasicGame.Game.prototype = {
         this.button.anchor.setTo(0.5);
         
     },
+    // request playing ke server deengan mengirimkan session game.
     joinClick:function(){
 
         session = Math.floor(Math.random()*1000)+"SESSIONGAME";
@@ -90,13 +101,14 @@ BasicGame.Game.prototype = {
             return;
         //console.log(this.stick.angle);
         if(this.lastAngle != this.stick.angle){
+            //jika user mengarahkan joystick ke kanan
             if(this.stick.angle > -90  && this.stick.angle < 90 && this.stick.angle != 0 && this.state != "right" && !this.isIdle)
             {
                     this.state = "right";
                     this.emitAction(session,"down","right");
                     this.emitAction(session,"up","left");
                 
-
+                    //jika user mengarahkan joystick ke kiri
             }else if((this.stick.angle < -90  || this.stick.angle > 90) && this.stick.angle != 0 && this.state != "left" && !this.isIdle)
             {
                 this.state = "left";
@@ -108,6 +120,8 @@ BasicGame.Game.prototype = {
         }
 
         this.lastAngle = this.stick.angle;
+
+        //jika user melepaskan joysticknya
         if(this.stick.force == 0){
             if(this.isIdle == false){
                 this.state = "idle";
@@ -120,6 +134,7 @@ BasicGame.Game.prototype = {
             this.isIdle = false;
         }
 
+        //jika user menekan tombol A (1 tombol sebelah kanan)
         if(this.buttonA.isDown && !this.isFire)
         {
             this.isFire = true;
@@ -130,6 +145,9 @@ BasicGame.Game.prototype = {
             this.emitAction(session,"up","fire");
         }
 	},
+    /*
+        Fungsi untuk  komunikasi dengan server, dengan tipe data yang ditentukan
+     */
     emitAction: function(session,act_behaviour,act_name){
         
         data.session = session;

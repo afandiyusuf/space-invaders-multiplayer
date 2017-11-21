@@ -20,12 +20,17 @@ Player.prototype = {
         this.instance.animations.add('turn', [4], 20, true);
         this.instance.animations.add('right', [5, 6, 7, 8], 10, true);
 	},
+    /*
+        register controller, corsurs dan jumbutton diambil dari Socket.js, yang diregister di game.js
+     */
 	registerControl:function(cursors,jumpButton)
 	{
-        console.log(this.cursors,cursors);
 		this.cursors = cursors;
 		this.jumpButton = jumpButton;
 	},
+    /*
+        Logic game berdasarkan state cursors, dan jumpButton yang didapat dari socket.js
+     */
 	update:function(){
 
         this.instance.body.velocity.x = 0;
@@ -75,9 +80,15 @@ Player.prototype = {
             this.jumpTimer = this.game.time.now + 750;
         }
 	},
+    /*
+        get instance player, digunakan untuk keperluar registrasi button
+     */
 	getPlayer:function(){
 		return this.instance;
 	},
+    /*
+        Get id dari player == id socket
+     */
     getId : function(){
         return this.id;
     }
