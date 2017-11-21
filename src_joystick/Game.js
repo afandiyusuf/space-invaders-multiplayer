@@ -93,28 +93,15 @@ BasicGame.Game.prototype = {
             if(this.stick.angle > -90  && this.stick.angle < 90 && this.stick.angle != 0 && this.state != "right" && !this.isIdle)
             {
                     this.state = "right";
-                    data.session = session;
-                    data.act_behaviour="down";
-                    data.act_name= "right";
-                    Client.socket.emit("req_down_action",data);
-                    data.act_behaviour="up";
-                    data.act_name= "left";
-                    Client.socket.emit("req_up_action",data);
+                    this.emitAction(session,"down","right");
+                    this.emitAction(session,"up","left");
                 
 
             }else if((this.stick.angle < -90  || this.stick.angle > 90) && this.stick.angle != 0 && this.state != "left" && !this.isIdle)
             {
-
-                console.log("left");
                 this.state = "left";
-                data.session = session;
-                data.act_behaviour="down";
-                data.act_name= "left";
-                Client.socket.emit("req_down_action",data);
-                data.act_behaviour="up";
-                data.act_name= "right";
-                Client.socket.emit("req_up_action",data);
-                this.state = "left";
+                this.emitAction(session,"down","left");
+                this.emitAction(session,"up","right");
             }
 
             
@@ -124,15 +111,8 @@ BasicGame.Game.prototype = {
         if(this.stick.force == 0){
             if(this.isIdle == false){
                 this.state = "idle";
-                data.session = session;
-                data.act_behaviour="up";
-                data.act_name= "right";
-                Client.socket.emit("req_up_action",data);
-                data.act_behaviour="up";
-                data.act_name = "left";
-                Client.socket.emit("req_up_action",data);
-                this.state = "idle"
-                console.log("trigger idle");
+                this.emitAction(session,"up","right");
+                this.emitAction(session,"up","left");
             }
             
             this.isIdle = true;
@@ -142,23 +122,21 @@ BasicGame.Game.prototype = {
 
         if(this.buttonA.isDown && !this.isFire)
         {
-            console.log("fire down");
             this.isFire = true;
-            data.session = session;
-            data.act_behaviour="down";
-            data.act_name= "fire";
-            Client.socket.emit("req_up_action",data);
+            this.emitAction(session,"down","fire");
         } else if(!this.buttonA.isDown && this.isFire)
         {
-            console.log("fire up");
             this.isFire = false;
-            data.session = session;
-            data.act_behaviour="up";
-            data.act_name= "fire";
-            Client.socket.emit("req_up_action",data);
+            this.emitAction(session,"up","fire");
         }
 	},
-
+    emitAction: function(session,act_behaviour,act_name){
+        
+        data.session = session;
+        data.act_behaviour=act_behaviour;
+        data.act_name= act_name;
+        Client.socket.emit("req_up_action",data);
+    },
 	quitGame: function (pointer) {
 
 		//	Here you should destroy anything you no longer need.
