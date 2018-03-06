@@ -82,11 +82,20 @@ BasicGame.Game.prototype = {
 
         this.pad = this.game.plugins.add(Phaser.VirtualJoystick);
 
+
         this.stick = this.pad.addStick(this.game.width*0.2, this.game.width*0.2, 200, 'generic');
         this.stick.scale = 1;
+        this.stick.onUp.add(function()
+        {
+            _.emitAction(session,"idle","idle");
+        })
 
         this.buttonA = this.pad.addButton(this.game.width*0.8, this.game.width*0.2, 'generic', 'button1-up', 'button1-down');
         this.buttonA.scale = 2;
+        this.buttonA.onUp.add(function(){
+            _.isFire = false;
+            _.emitAction(session,"down","trigger");
+        });
         //
         this.isFire = false;
         this.isIdle = false;
@@ -99,6 +108,7 @@ BasicGame.Game.prototype = {
 	update: function () {
         if(!this.isPlay)
             return;
+
         //console.log(this.stick.angle);
         if(this.lastAngle != this.stick.angle){
             //jika user mengarahkan joystick ke kanan
@@ -107,16 +117,16 @@ BasicGame.Game.prototype = {
                     this.state = "right";
                     this.emitAction(session,"down","right");
                     this.emitAction(session,"up","left");
+                    console.log("RIGHT");
                 
                     //jika user mengarahkan joystick ke kiri
             }else if((this.stick.angle < -90  || this.stick.angle > 90) && this.stick.angle != 0 && this.state != "left" && !this.isIdle)
             {
+                console.log("LEFT");
                 this.state = "left";
                 this.emitAction(session,"down","left");
                 this.emitAction(session,"up","right");
             }
-
-            
         }
 
         this.lastAngle = this.stick.angle;
@@ -134,16 +144,12 @@ BasicGame.Game.prototype = {
             this.isIdle = false;
         }
 
-        //jika user menekan tombol A (1 tombol sebelah kanan)
-        if(this.buttonA.isDown && !this.isFire)
-        {
-            this.isFire = true;
-            this.emitAction(session,"down","fire");
-        } else if(!this.buttonA.isDown && this.isFire)
-        {
-            this.isFire = false;
-            this.emitAction(session,"up","fire");
-        }
+        // //jika user menekan tombol A (1 tombol sebelah kanan)
+        // if(this.buttonA.isDown && !this.isFire)
+        // {
+        //     this.isFire = true;
+        //     this.emitAction(session,"down","fire");
+        // }
 	},
     /*
         Fungsi untuk  komunikasi dengan server, dengan tipe data yang ditentukan

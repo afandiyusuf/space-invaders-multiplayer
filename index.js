@@ -24,7 +24,7 @@ app.get('/register',function(req,res){
 
 //joystick, joystick url
 app.get('/joystick',function(req,res){
-	console.log(req.param('id'));
+	//console.log(req.body.id);
 	res.sendFile(__dirname+'/joystick.html');
 });
 

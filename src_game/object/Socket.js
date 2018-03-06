@@ -48,42 +48,42 @@ var Socket = function(game){
     Penggantian state button left, right, jump, berdasarkan komunikasi dari webserver dan id socket
  */
 Socket.prototype.listenButton = function(){
-        this.socket.on('action',function(data){
+    this.socket.on('action',function(data){
+        console.log(data);
 
-            if(data.act_name == "left")
+        if(data.act_name == "left")
+        {
+            if(data.act_behaviour == "down")
             {
-                if(data.act_behaviour == "down")
-                {
-                    _.cursors[""+data.session].left.isDown = true;
-                }
-                else if(data.act_behaviour == "up")
-                {
-                    console.log("left up");
-                    _.cursors[""+data.session].left.isDown = false;
-                }
+                _.cursors[""+data.session].left.isDown = true;
+                _.cursors[""+data.session].right.isDown = false;
             }
-            else if(data.act_name == "right")
+           
+        }else if(data.act_name == "trigger")
+        {
+            _.jumpButtons[""+data.session].onUp(_.jumpButtons[""+data.session].instance);
+        }
+        else if(data.act_name == "right")
+        {
+            if(data.act_behaviour == "down")
             {
-                if(data.act_behaviour == "down")
-                {
-                    console.log("go to right");
-                    _.cursors[""+data.session].right.isDown = true;
-                }
-                else if(data.act_behaviour == "up")
-                {
-                    _.cursors[""+data.session].right.isDown = false;
-                }
-            }else if(data.act_name == "fire")
+               // console.log("go to right");
+                _.cursors[""+data.session].right.isDown = true;
+                _.cursors[""+data.session].left.isDown = false;
+            }
+        }else if(data.act_name == "idle")
             {
-                if(data.act_behaviour == "down")
-                {
-                    _.jumpButtons[""+data.session].isDown = true;
-                }else if(data.act_behaviour == "up")
-                {
-                    _.jumpButtons[""+data.session].isDown = false;
-                }
-            } 
-        });     
+                _.cursors[""+data.session].right.isDown = false;
+                    _.cursors[""+data.session].left.isDown = false;
+            }
+        }
+    );     
+}
+Socket.prototype.triggerButton = function(id,triggerFunction)
+{
+    console.log(_.cursors[""+id]);
+    _.cursors[""+id].triggerFunction = null;
+    _.cursors[""+id].triggerFunction = triggerFunction;
 }
 
 // Mendapatkan cursors berdasarkan id
@@ -93,7 +93,8 @@ Socket.prototype.getCursors = function(id)
 }
 
 // Mendapatkan jumpButton berdasarkan id
-Socket.prototype.getJumpButton = function(id)
+Socket.prototype.setJumpButton = function(id,onUp,instance)
 {
-	return _.jumpButtons[""+id];
+	_.jumpButtons[""+id].onUp = onUp;
+    _.jumpButtons[""+id].instance = instance;
 }

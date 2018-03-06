@@ -67,7 +67,10 @@ BasicGame.Game.prototype = {
         this.player.create();
         this.physics.enable(this.player.instance, Phaser.Physics.ARCADE);
         this.player.initPhysic();
-        this.player.registerControl(this.socket.getCursors(id),this.socket.getJumpButton(id));
+        this.player.registerControl(this.socket.getCursors(id));
+        this.socket.setJumpButton(id,this.player.jumpTrigger,this.player.instance);
+        //this.socket.triggerButton(this.socket.getCursors(id),this.player.jumpTrigger);
+        //this.socket.setTriggerFunction(this.socket.getCursors(id),this.player.jumpTrigger);
         this.players.push(this.player);   
     },
     removePlayer : function(id){
