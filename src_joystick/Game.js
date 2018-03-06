@@ -92,10 +92,11 @@ BasicGame.Game.prototype = {
 
         this.buttonA = this.pad.addButton(this.game.width*0.8, this.game.width*0.2, 'generic', 'button1-up', 'button1-down');
         this.buttonA.scale = 2;
-        this.buttonA.onUp.add(function(){
+        this.buttonA.onDown.add(function(){
             _.isFire = false;
             _.emitAction(session,"down","trigger");
         });
+        console.log(this.buttonA);
         //
         this.isFire = false;
         this.isIdle = false;
